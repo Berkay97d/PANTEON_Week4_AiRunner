@@ -20,9 +20,8 @@ public class Enemy : MonoBehaviour
     {
         MoveToFinish();
     }
-
-
-    private void MoveToFinish()
+    
+    private void MoveToFinish() //FİNİSHE DOĞRU KOŞ
     {
         agent.destination = targetPos.position;
     }

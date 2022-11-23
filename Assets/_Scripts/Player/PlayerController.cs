@@ -1,55 +1,33 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System;
+using _Scripts.Player;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
-{
-    [Header("Referances")]
-    [SerializeField] private FloatingJoystick joystick;
-    
-    [Header("Values")] 
-    [SerializeField] private float forwardSpeed;
 
-    [SerializeField] private float horizontalSpeed;
-    
-
-    private void Update()
+    public class PlayerController : MonoBehaviour
     {
-        StartGame();
-    }
-
-
-    private void StartGame()
-    {
-        if (!GameController.isLevelStarted)
+        
+        private void Start() //BAŞLANGIÇTA IDLE OLMASI İÇİN
         {
-            return;
+            Player.PlayerState = PlayerStates.Waiting;
         }
-        MoveHorizontal();
-        MoveForward();
-    }
-    
-    private void MoveHorizontal()
-    {
-        var horizontalInput = joystick.Horizontal;
-        
-        HandleRotation(horizontalInput);
-        transform.Translate(Vector3.right * (Time.deltaTime * horizontalSpeed * horizontalInput));
-    }
-    
-    private void MoveForward()
-    {
-        transform.Translate(Vector3.forward * (forwardSpeed * Time.deltaTime));
-    }
 
-    private void HandleRotation(float input)
-    {
-        var rotateValue = 15 * input;
-        var rotationVector = new Vector3(0, rotateValue, 0);
-        
-        transform.rotation = Quaternion.Euler(rotationVector);
+        public void StartRunning() //START GAME BUTONUNA ATANDI
+        {
+            Player.PlayerState = PlayerStates.Running;
+        }
+
+        public void MakePlayerJump(float jumpForce)
+        {
+            Player.PlayerState = PlayerStates.Falling; 
+            var rb = gameObject.GetComponent<Rigidbody>();
+            rb.AddForce(new Vector3(0,1,.1f) * jumpForce);
+        }
+
+        private void OnCollisionEnter(Collision collision) //FALLINGDEN YERE TEMAS EDİNCE RUNNİNGE ALDIM
+        {
+            if (Player.PlayerState == PlayerStates.Falling && collision.gameObject.CompareTag("Ground"))
+            {
+                Player.PlayerState = PlayerStates.Running;
+            }
+        }
     }
-    
-    
-}
